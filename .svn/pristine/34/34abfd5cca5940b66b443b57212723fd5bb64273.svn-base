@@ -1,0 +1,39 @@
+<template>
+    <div class="device-qr">
+                <!-- <div v-for="item in chosenList" :key="item.macId" class="device-qr-item"> -->
+        <p>我的二维码</p>
+        <vue-qr :logoSrc="imageUrl" :text="qrText" :size="320" :margin="20" :dotScale="0.6" :logoScale="20"></vue-qr>
+
+                <!-- </div> -->
+    </div>
+</template>
+<script>
+import VueQr from 'vue-qr'
+import logoimg from './../../assets/img/logo.jpg'
+export default {
+    components: {
+        VueQr
+    },
+    data () {
+        return {
+            imageUrl: logoimg
+        }
+    },
+    computed: {
+        qrText () {
+            return 'http://xrybiz.tsw202.com/xry/index.html#/user/qrRecommend?aCode=' +
+            JSON.parse(window.localStorage.user).aCode + '&aType=' + JSON.parse(window.localStorage.user).aType
+        }
+    }
+}
+</script>
+<style lang="less">
+.device-qr{
+    height: 100%;
+    text-align: center;
+    background: rgba(62,148,244,.05);
+    p{
+        padding: 20px;
+    }
+}
+</style>

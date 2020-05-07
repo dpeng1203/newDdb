@@ -1,0 +1,269 @@
+<template>
+    <div class="using">
+        <div class="using-top">
+            <van-circle
+                v-model="currentRate"
+                color="#07c160"
+                size="4.8rem"
+                layer-color="#ebedf0"
+                :rate="rate"
+                :speed="100"
+                :stroke-width="60"
+            >
+            <!-- <div slot="default" class="using-count" v-show="textShow">{{text}}</div> -->
+            <div slot="default" class="using-count" >
+                <van-count-down :time="time">
+                    <template v-slot="timeData">
+                        <span class="item">{{ timeData.minutes }}</span>
+                        <span class="item">{{ timeData.seconds }}</span>
+                    </template>
+                </van-count-down>
+            </div>
+            </van-circle>
+            <div class="using-des">
+                <p>{{useText}}</p>
+                <p>离开时请带好您的随身物品</p>
+            </div>
+        </div>
+        <div class="block"></div>
+        <div class="using-order">
+            <p class="using-order-title">订单信息</p>
+            <div class="flex-space">
+                <p>机器编号</p>
+                <p>{{at}}</p>
+            </div>
+            <div class="flex-space">
+                <p>服务时间</p>
+                <p>{{serviceTime}}</p>
+            </div>
+            <div class="flex-space">
+                <p>已支付</p>
+                <p>{{money}}</p>
+            </div>
+        </div>
+        <div class="flex-space using-desc">
+            <img src="./../../assets/img/sun.png" alt="">
+            <div>
+                <p>在理疗过程中</p>
+                <p>局部会出现灼热的刺痛感</p>
+            </div>
+        </div>
+        <div class="flex-space using-desc">
+            <img src="./../../assets/img/cup.png" alt="">
+            <div>
+                <p>在理疗过程中</p>
+                <p>需要多喝温水来补充身体的水分</p>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+import {
+    fetchPost
+} from '@/utils/axios'
+import api from '@api/app'
+import { Toast  } from 'vant'
+export default {
+    data () {
+        return {
+            currentRate: 0,
+            rate: 0,
+            text: '启动中……',
+            textShow: true,
+            barcode: '',
+            at: 0,
+            pcode: '',
+            ptime: 0,
+            pprice: 0,
+            serviceTime: '设备启动中……',
+            orderId: '',
+            status: 0,
+            orderInfo: {},
+            useText: '理疗中...',
+            time: 0,
+            timeData: {
+                minutes: 0,
+                seconds: 0,
+
+            }
+        }
+    },
+    computed: {
+        money () {
+            return this.pprice.toFixed(2)
+        }
+    },
+    mounted () {
+        let _self = this
+        this.$nextTick(function () {
+            if (!_self.orderInfo.oMacStartStatus) {
+                let statusTimer = setInterval(function () {
+                    _self.getOrderInfo(_self.orderId)
+                    if (_self.orderInfo.oMacStartStatus === 1) {
+                        _self.serviceTime = _self.orderInfo.oMacStart
+                        _self.ptime = _self.orderInfo.pTime
+                        _self.time = _self.orderInfo.pTime * 1000
+                        _self.timeData.minutes = Math.floor(_self.ptime / 60)
+                        _self.timeData.seconds = _self.ptime % 60
+                        
+                        let goTime = 0
+                        setInterval(function() {
+                            goTime++
+                            if(goTime >= _self.ptime) {
+                                _self.currentRate = 100
+                                _self.useText = '理疗结束'
+                            }else{
+                                _self.currentRate = (goTime / _self.ptime) * 100
+                            }
+                            
+                        },1000)
+                        clearInterval(statusTimer)
+                        // _self.countDown()
+                    }
+                }, 2000)
+            } else {
+                // this.countDown(_self)
+            }
+            // let day = new Date()
+            // _self.serviceTime = day.getFullYear() + '-' + (day.getMonth() + 1) + '-' + day.getDate() + ' ' + day.getHours() + ':' + day.getMinutes() + ':' + day.getSeconds()
+        })
+    },
+    methods: {
+        formart (val) {
+            if (val >= 10) return val
+            else return '0' + val
+        },
+        getOrderInfo (orderId) {
+            api.getOrderInfo({ orderId }).then(res => {
+                this.orderInfo = res[0]
+                this.pprice = this.orderInfo.oPayCash
+                this.at = this.orderInfo.macId
+            }).catch(err => Toast.fail(err.msg))
+        },
+        countDown () {
+            // 倒计时
+            let _self = this
+            let count = 0
+            let min = Math.floor(_self.ptime / 60)
+            let sec = _self.ptime % 60
+            if (!sec) {
+                min = Math.floor(_self.ptime / 60) - 1
+            }
+            _self.timer = setInterval(function () {
+                if (sec === 0) {
+                    sec = 60
+                }
+                sec--
+                count++
+                min = Math.floor((_self.ptime - count) / 60)
+                _self.rate = (count / _self.ptime) * 100
+                _self.currentRate = (count / _self.ptime) * 100
+                if (count === _self.ptime) {
+                    _self.useText = '理疗结束'
+                    clearInterval(_self.timer)
+                }
+                _self.text = _self.formart(min) + ' : ' + _self.formart(sec)
+            }, 1000)
+        }
+    },
+    beforeRouteEnter (to, from, next) {
+        let orderId = to.query.orderid
+        // let barcode = to.query.barcode
+        // let at = to.query.at
+        // let pcode = to.query.pcode
+        // fetchPost('/zqxry/bizqry/getProducts', { pcode }).then(res => {
+        next(vm => {
+            vm.orderId = orderId
+            vm.getOrderInfo(orderId)
+            // console.log(res[0].pTime)
+            // vm.barcode = barcode
+            // vm.at = at
+            // vm.pcode = res[0].pCode
+            // vm.ptime = res[0].pTime
+            // vm.pprice = res[0].pPrice
+        })
+        // })
+    },
+    destroyed () {
+        // clearInterval(this.timer)
+        // clearInterval(this.statusTimer)
+    }
+}
+</script>
+<style lang="less">
+@s: 0.0133rem;
+.using{
+    .using-top{
+        height: 586*@s;
+        background-image: url('./../../assets/img/using_top.png');
+        background-size: 100% 100%;
+        box-sizing: border-box;
+        text-align: center;
+        padding-top: 40*@s;
+        .using-count{
+            font-size: 38*@s;
+            line-height: 360*@s;
+            margin-top: 160*@s;
+            color: #fff;
+
+        }
+        .using-des{
+            margin-top: 37*@s;
+            color: #fff;
+            font-size: 30*@s;
+        }
+    }
+    .block{
+        height: 65*@s;
+        background: #fff;
+    }
+    .using-order{
+        font-size: 30*@s;
+        text-align: center;
+        padding: 20*@s;
+        border-top:5px solid #f2f2f2;
+        border-bottom:5px solid #f2f2f2;
+        &-title{
+            &::before{
+                content: ' ';
+                height: 0px;
+                display: inline-block;
+                border-top: 2px solid #B5B5B5;
+                width: 80*@s;
+                vertical-align: middle;
+                margin-right: 12*@s;
+            }
+            &::after{
+                content: ' ';
+                height: 0px;
+                display: inline-block;
+                border-top: 2px solid #B5B5B5;
+                width: 80*@s;
+                vertical-align: middle;
+                margin-left: 12*@s;
+            }
+        }
+        div{
+            line-height: 60*@s;
+        }
+    }
+    .using-desc{
+        font-size: 24*@s;
+        padding: 46*@s  80*@s;
+        border-bottom:5px solid #f2f2f2;
+        background: #fff;
+        p{
+            text-align: center;
+        }
+    }
+    .item {
+        display: inline-block;
+        width: 22px;
+        margin-right: 5px;
+        color: #fff;
+        font-size: 28*@s;
+        text-align: center;
+        background-color: rgba(255,255,255,0);
+    }
+}
+</style>

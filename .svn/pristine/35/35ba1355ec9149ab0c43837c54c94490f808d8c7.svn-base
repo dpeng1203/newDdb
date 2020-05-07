@@ -1,0 +1,294 @@
+<template>
+    <div class="login">
+        <!-- <van-cell-group> -->
+            <div class="login-img">
+                <img src="../../assets/img/login_bc.png" alt="">
+                <img src="../../assets/img/login_ddb.png" alt="" class="ddb">
+            </div>
+            <div class="cont">
+                <van-field
+                    v-model="aName"
+                    center
+                    required
+                    clearable
+                    placeholder="请输入用户名"
+                    :border="false"
+                    style="border:none;border-bottom:1px solid #e9e9e9"
+                />
+                <van-field
+                    v-model="pwd"
+                    :border="false"
+                    center
+                    required
+                    clearable
+                    placeholder="请输入密码:6-20字符"
+                    type="password"
+                    style="border-bottom:1px solid #e9e9e9"
+                >
+                </van-field>
+                <van-field
+                    v-model="repeatPwd"
+                    :border="false"
+                    center
+                    required
+                    clearable
+                    placeholder="请再次输入密码"
+                    type="password"
+                    style="border-bottom:1px solid #e9e9e9"
+                >
+                </van-field>
+                <template v-if="recACode === 0">
+                <van-field
+                    v-model="promCode"
+                    :border="false"
+                    center
+                    required
+                    clearable
+                    placeholder="请输入授权码"
+                    type="number"
+                    style="border-bottom:1px solid #e9e9e9"
+                >
+                </van-field>
+                </template>
+                <van-field
+                    v-model="mobile"
+                    :border="false"
+                    center
+                    required
+                    clearable
+                    placeholder="请输入手机号码"
+                    type="number"
+                    style="border-bottom:1px solid #e9e9e9"
+                >
+                </van-field>
+                <van-field
+                    v-model="certCode"
+                    :border="false"
+                    center
+                    required
+                    clearable
+                    type="number"
+                    placeholder="请输入验证码"
+                    style="border-bottom:1px solid #e9e9e9"
+                >
+                    <van-button slot="button" size="small" type="primary" style="border-radius:4px;background:#46BDAE;font-size:14px;" @click="sendSms" >发送验证码</van-button>
+                </van-field>
+                <van-field
+                    :border="false"
+                    v-model="areaFullName"
+                    center
+                    required
+                    clearable
+                    placeholder="请选择地区"
+                    style="border-bottom:1px solid #e9e9e9"
+                    readonly
+                    @click="show=true"
+                >
+                </van-field>
+                <van-field
+                    :border="false"
+                    v-model="areaFullName"
+                    center
+                    required
+                    placeholder="注册类型："
+                    readonly
+                >
+                </van-field>
+                <div class="radio">
+                    <van-radio-group v-model="radio">
+                        <van-radio-group v-model="radio">
+                            <van-cell-group>
+                                <van-cell title="全国" clickable @click="radio = '3'">
+                                    <van-radio slot="right-icon" name="3" checked-color="#3FC7C7"/>
+                                </van-cell>
+                                <van-cell title="联合" clickable @click="radio = '4'">
+                                    <van-radio slot="right-icon" name="4" checked-color="#3FC7C7"/>
+                                </van-cell>
+                                <van-cell title="商家" clickable @click="radio = '5'">
+                                    <van-radio slot="right-icon" name="5" checked-color="#3FC7C7"/>
+                                </van-cell>
+                            </van-cell-group>
+                        </van-radio-group>
+                    </van-radio-group>
+                </div>
+                <van-popup v-model="show" position="bottom ">
+                        <van-area :area-list="areaList" @confirm="getArea" @cancel="show=false"/>
+                    </van-popup>
+                <!-- <van-checkbox v-model="checked" checked-color="#07c160">
+                    <div slot="default" class="contract" @click="contractShow = true">
+                        我已阅读并同意《注册协议》
+                    </div>
+                </van-checkbox> -->
+                <van-button round type="primary" size="large" class="btn" @click="submit" >注册</van-button>
+            </div>
+            
+            <!-- <van-button round type="primary" size="large" class="btn" @click="submit" :disabled="!dis">注册</van-button> -->
+            <van-dialog
+                v-model="contractShow"
+                title="协议"
+            >
+                <div>
+甲、乙双方均为具有独立承担民事责任的主体。为了进一步推广大健康产业市场发展，甲、乙双方本着自愿、平等、诚实、信用及合作共赢的原则，根据《中华人民共和国合同法》及相关法律规定，签订本合作协议，供双方共同恪守。
+第一条、合作宗旨
+甲、乙双方合作经营的宗旨，是充分发挥甲方的产品优势，以期为乙方提供专业、优质的大健康产品服务。
+第二条、合作方式
+1、甲方同意乙方支付               元作为大健康产品的经营权合作费，乙方全额支付的费用将作为______台设备的三年经营权代理合作费用标准计价为8800元/台（大写：捌仟捌佰元整），也是本协议生效的条件。
+2、乙方获得的服务奖金收入（不含税），甲方负责代开具国家合法规定缴纳的税务税金发票（劳务税发票、个人所得税发票等），从乙方的服务奖金中直接扣除，每周发放奖金。如乙方具备开票条件的，由乙方自行开票。
+3、本协议签订后，赠送乙方合伙人的业务资格，按照甲方规范要求，可对外拓展市场发展业务。
+第三条、赠送合伙人业务资格内容
+乙方获得赠送业务资格后，享受以下业务权益：
+1、每销售直接推广一台设备（8800元/台）奖励1000元/台，间接推广奖励800元/台；
+2、甲方扫码支付市场指导价27元/次，乙方也可根据自身所在地消费标准自行定价，但不得低于甲方市场指导价。
+3、单次扫码甲方提留7元/次作为市场推广费用。每次扫码收益奖励：直接推广每次奖励1元/次，间接推广奖励1元/次；
+4、三年经营权到期以后，设备所有权依然属于甲方所有，乙方具有优先享有续订权，无需续費。
+第五条、违约责任
+1、乙方在履行协议过程中，不得诋毁甲方公司和品牌的商誉，如由乙方的不良行为存在诋毁甲方公司和品牌荣誉行为的情况，甲方有权单方面解除本协议，并追究乙方相应的违约责任。甲方单方面解除协议后，经营权即终止，甲乙双方所产生的费用也相互不返还。
+2、乙方有严重违约行为（包括但不限于本协议第五至十条的约定内容）致使协议无法继续履行或乙方违约的，甲方有权解除协议，同时甲方有权向乙方提出叁拾万元违约赔偿。
+3、甲方承诺在租赁期间按照国家相关规定设备免费维修一年，后期维护收取相应成本费用，如因乙方擅自打开仪器以及拆卸造成损坏，一切后果有乙方承担。
+4、甲方负责设备售后维护，乙方必须按照甲方使用手册规范操作，如若由乙方违规操作引起的设备损坏以及其他不良后果，产生的所有不良后果由乙方承担。
+第六条、保密条款
+1、甲方根据本协议向乙方披露的各项公司信息，是甲方公司和品牌的商业秘密资料，乙方应采取相应的保密措施防止失密，未经甲方书面允许，不得以任何原因、任何形式向第三方透露。如因乙方的原因造成资料的外泄且给甲方公司和品牌带来了潜在以及已经发生的危害，由此造成的损失，甲方将向乙方追责拾万元赔偿责任，甲方保留相关司法救济的权利。
+2、本协议的甲方向乙方按照本协议的约定所提供的资料享有合法的完整的所有权，乙方应采取保密措施防止失密。本保密条款不因协议的更改、终止或解除等原因而失效。
+第七条、不可抗力：
+1、本协议所称不可抗力，是双方在缔结本以及履行本协议时由于地震、台风、水灾、火灾、战争以及其他不可预见，并且发生和后果不能预防或不能避免且不可克服的客观因素。
+2、双方任一方由于不可抗力事故的影响而不能履行协议时，应当提前15天告知对方并提供相应证明，可以不承担损害赔偿责任。如因一方延迟通知造成对方损失扩大的，应当就扩大的损失向对方承担赔偿责任，或一方延迟履行协议后发生不可抗力的，不能免除责任。
+3、如果因不可抗力因素导致本协议中止履行15日或以上时，甲方有权决定是否继续履行或终止本协议，并书面通知乙方。
+第八条、争议的解决
+1、本协议与附件的规定如不一致，按下列顺序进行解释：
+①按本协议的目的；②按甲方的标准文件规定；③按通常的解释；④按甲方的解释；⑤按国家相关法律、法规，包括各部委的相关法律法规；
+2、甲乙双方如发生争议，应当友好协商解决。如协商不成，任何一方均有权就争议事项向甲方所在地法院提起诉讼。
+第九条、附则
+1、本协议附件视为本协议的一部分，与本协议具备同等法律效力。
+2、本协议未尽事宜双方协商，另作补充协议条款，与本协议具备同等法律效力。
+3、本协议签署后，乙方获得的经营权不能退款，但经甲方书面同意后，可以有偿向第三方进行转让。
+4、本协议双方签字或盖章后生效。一式贰份，甲乙双方各壹份，具有同等法律效力。
+第十条、附加条款
+
+                </div>
+            </van-dialog>
+        <!-- </van-cell-group> -->
+    </div>
+</template>
+<script>
+import api from '@api/app'
+import { Toast, Dialog,RadioGroup, Radio,Cell,CellGroup } from 'vant'
+import area from '@utils/area'
+export default {
+    data () {
+        return {
+            show: false,
+            areaList: area,
+            areaFullName: '',
+            aName: '',
+            mobile: '',
+            promCode: '',
+            certCode: '',
+            pwd: '',
+            repeatPwd: '',
+            provinceCode: '', // 所属省
+            cityCode: '', // 所属市
+            areaCode: '', // 所属区
+            aAddress: '',
+            errorMessage: { mobile: '', certCode: '', pwd: '' },
+            checked: false,
+            contractShow: false,
+            recACode: 0,
+            radio: '3'
+        }
+    },
+    computed: {
+        dis () {
+            return /^1\d{10}$/.test(this.mobile) && this.aName !== '' &&
+                    /^\d{4}$/.test(this.certCode) && this.areaFullName !== '' &&
+                    this.repeatPwd === this.pwd && this.pwd.length >= 6 
+                    && (/^\d{8}$/.test(this.promCode) || (this.recACode !== 0 && this.promCode === ''))
+        }
+    },
+    methods: {
+        submit () {
+            let params = {
+                mobile: this.mobile,
+                pwd: this.pwd,
+                aName: this.aName,
+                promCode: this.promCode,
+                certCode: this.certCode,
+                provinceCode: this.provinceCode,
+                cityCode: this.cityCode,
+                areaCode: this.areaCode,
+                recACode: this.recACode,
+                aAddress: this.areaFullName,
+                aType: this.radio
+            }
+            console.log(params)
+            api.register(params).then(res => {
+                console.log(res === 'success')
+                // if (res === 'success') {
+                // Toast.success('注册成功') // .then(() => this.$router.replace({ name: 'login' }))
+                // this.$router.replace({ name: 'login' }
+                // }
+                Dialog.alert({
+                    message: '注册成功'
+                }).then(() => {
+                    this.$router.replace({ name: 'login' })
+                })
+            }).catch(err => Toast.fail(err.msg))
+        },
+        toFindPwd () {
+            this.$router.push({ name: 'findPwd' })
+        },
+        sendSms () {
+            let params = {
+                mobile: this.mobile,
+                type: 'register'
+            }
+            api.sendSms(params).then(res => {
+                Toast.success('正在发送')
+            }).catch(err => Toast.fail(err.msg))
+        },
+        getArea (val) {
+            console.log(val)
+            this.show = false
+            this.areaFullName = val[0].name + val[1].name + val[2].name
+            this.provinceCode = val[0].code
+            this.cityCode = val[1].code
+            this.areaCode = val[2].code
+        }
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+            vm.recACode = to.query.recACode || 0
+            console.log(vm.recACode)
+        })
+    }
+}
+</script>
+<style lang="less">
+@s: 0.0133rem;
+.login{
+    // margin-top: 120*@s;
+    // padding: 0 66*@s;
+    background: #fff;
+    padding-bottom: 100*@s;
+    .login-img{
+        text-align: center;
+        .ddb{
+            width: 265*@s;
+            margin-top: 22*@s;
+        }
+    }
+    .cont{
+        padding: 90*@s 80*@s 0;
+    }
+    .btn{
+        margin-top:100*@s;
+        background: #3FC7C7;
+        height: 76*@s;
+        line-height: 76*@s;
+
+    }
+    .contract{
+        font-size: 26*@s;
+        text-decoration: underline;
+    }
+}
+</style>

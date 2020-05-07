@@ -1,0 +1,350 @@
+<template>
+  <div class="home">
+      <div class="home-top">
+          <div class="t-top">
+            <img class="profilePicture" src="./../assets/img/logo.jpg" alt="">
+            <p class="minM vipId">会员ID： {{member.aCode}}</p>
+            <p class="minM vipName">会员名： {{member.aName}}-{{role}}</p>
+          </div>
+        <van-row type="flex" justify="space-around" class="b-top">
+          <!-- <van-col span="6">
+            <div>
+              <img class="top-tubiao" src="./../assets/img/yue.png" alt="">
+              <p class="top-tubiaowz left" >我的余额</p>
+            </div>
+          </van-col> -->
+          <van-col span="6">
+            <div>
+             <img class="top-tubiao" src="./../assets/img/tixian.png" @click="turnTo('withdraw')" alt="">
+             <p class="top-tubiaowz center" >提现</p>
+            </div>
+            </van-col>
+
+          <van-col span="6">
+            <router-link is-link to="withdrawMybenefits">
+            <div>
+               <img class="top-tubiao" src="./../assets/img/zhengmoney.png" alt="">
+               <p class="top-tubiaowz right" >我的收益</p>
+           </div>
+           </router-link>
+          </van-col>
+        </van-row>
+        </div>
+
+        <div class="home-bottom">
+          <div class="tubiaodiv" v-for="(item, index) in menuList"
+          :title="item.title"
+          :key="index"
+          v-if="item.show"
+        >
+
+           <router-link is-link :to="item.to" >
+            <div class="home-bottom-imgdiv" >
+               <transition name="fade">
+             <img class="home-bottom-img" :src="item.imgSrc" alt="">
+              </transition>
+            </div>
+           </router-link>
+
+          <p class="home-bottom-desc">{{item.title}}</p>
+        </div>
+      </div>
+
+      <div class="home-logout">
+            <van-button type="danger" size="large" @click="logout">退出</van-button>
+        </div>
+    </div>
+</template>
+
+<script>
+import { fetchPost } from '@utils/axios'
+import { Toast, Dialog } from 'vant'
+
+import deviceIcon from './../assets/img/shebei.png'
+import agentIcon from './../assets/img/daili.png'
+import stats from './../assets/img/shouquanma (2).png'
+import qrIcon from './../assets/img/erweima.png'
+import agentUpIcon from './../assets/img/yunying.png'
+import recommendIcon from './../assets/img/tuijianman.png'
+import shop from './../assets/img/goumai.png'
+import promIcon from './../assets/img/shouquanma (1).png'
+import order from './../assets/img/orderfind.png'
+import macPriceIcon from './../assets/img/shebeijiage.png'
+
+export default {
+    name: 'home',
+    data () {
+        return {
+            list: [],
+            memberInfo: '',
+            member: '',
+            code: this.code
+        }
+    },
+    computed: {
+        menuList () {
+            return [
+                { imgSrc: deviceIcon, title: '我的设备', to: { name: 'device' }, show: this.isInArray([1, 2, 3, 4], this.member.aType) },
+                { imgSrc: agentIcon, title: '我的代理', to: { name: 'agent' }, show: this.isInArray([1, 2, 3], this.member.aType) },
+                { imgSrc: stats, title: '报表查询', to: { name: 'statsAgent' }, show: this.isInArray([1, 2, 3, 4], this.member.aType) },
+                { imgSrc: qrIcon, title: '我的二维码', to: { name: 'qrcode' }, show: this.isInArray([1, 2, 3, 4], this.member.aType) },
+                { imgSrc: agentUpIcon, title: '升级运营', to: { name: 'agentUp' }, show: this.isInArray([4], this.member.aType) },
+                { imgSrc: recommendIcon, title: '我的推荐', to: { name: 'recommendList' }, show: this.isInArray([1, 2, 3, 4], this.member.aType) },
+                { imgSrc: shop, title: '申领设备', to: { name: 'buy' }, show: this.isInArray([1, 2, 3, 4], this.member.aType) },
+                { imgSrc: promIcon, title: '授权码', to: { name: 'sendProm' }, show: this.isInArray([1, 2, 3], this.member.aType) },
+                { imgSrc: order, title: '订单查询', to: { name: 'orderQuery' }, show: this.isInArray([1, 2, 3, 4], this.member.aType) },
+                { imgSrc: macPriceIcon, title: '设备价格', to: { name: 'devicePrice' }, show: this.isInArray([4], this.member.aType) },
+                { imgSrc: macPriceIcon, title: '充值', to: { name: 'recharge' }, show: this.isInArray([1], this.member.roleType) }
+            ]
+        },
+
+        role () {
+            let type = this.member.aType
+            let text
+            if (type === 1) {
+                text = '总部'
+            } else if (type === 2) {
+                text = ' 特许经营商' // '市代'
+            } else if (type === 3) {
+                text = '全国运营商' // '区代'
+            } else if (type === 4) {
+                text = '联合运营商' // '商户'
+            }
+            return text
+        }
+    },
+    methods: {
+        turnTo (routerName) {
+            this.$router.push({ name: routerName })
+        },
+        logout () {
+            localStorage.clear('agentToken')
+            this.$router.replace({ name: 'login' })
+        },
+        // 根据atype判断菜单权限
+        isInArray (arr, value) {
+            for (var i = 0; i < arr.length; i++) {
+                if (value === arr[i]) {
+                    return true
+                }
+            }
+            return false
+        },
+        //授权
+        // accredit() {
+        //   let url = window.location.href.split('#')[0]
+        //   this.$api.wx.memberAuthorization({url}).then(res => {
+        //     if(res.resultCode === 1) {
+        //       window.location.href = res.data
+        //     }
+        //   })
+        // },
+    },
+    beforeRouteEnter (to, from, next) {
+        // console.log(from)
+        let url = window.location.href
+        let code
+        if(url.indexOf('?code') > -1) {
+          let search = url.split('?')[1]
+          code = search.split('&')[0]
+          code = code.split('=')[1]
+        }else{
+          // this.accredit()
+          // let url = window.location.href
+          // this.$api.wx.memberAuthorization({url}).then(res => {
+          //   if(res.resultCode === 1) {
+          //     window.location.href = res.data
+          //   }
+          // })
+          fetchPost('/zqxry/agentAuthorization', {url}).then(res => {
+            if(res.resultCode === 1) {
+              next(vm => {
+                window.location.href = res.data
+              })
+              // window.location.href = res.data
+            }
+            // console.log(res)
+            // next(vm => {
+            //     vm.memberInfo = res
+            //     vm.member = res.member
+            //     window.localStorage.user = JSON.stringify(res.member)
+            // })
+          })
+        }
+        let params = {
+            opType: 201,
+            xry_token_id: window.localStorage.agentToken,
+            code: code
+        }
+        fetchPost('/zqxry/bizqry/service', params).then(res => {
+            // console.log(res)
+            next(vm => {
+                vm.memberInfo = res
+                vm.member = res.member
+                window.localStorage.user = JSON.stringify(res.member)
+            })
+        }).catch(err => {
+            // Toast.fail(err.msg)
+            if (err.resultCode === -6) {
+                localStorage.clear('agentToken')
+                Dialog.alert({
+                    message: err.msg
+                }).then(() => {
+                    next({ name: 'login' })
+                })
+            } else {
+                Toast.fail(err.msg)
+            }
+        })
+    },
+
+}
+
+</script>
+
+<style lang="less" scoped>
+@s: 0.0133rem;
+html, body {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+.home{
+  min-height: 100%;
+  padding-bottom: 120*@s;
+  box-sizing: border-box;
+  background: #F1F1F1;
+  overflow-x:hidden;
+  .home-top{
+    position: relative;
+    width: 100%;
+    height: 30%;
+    background: #FFFFFF;
+    .t-top{
+      overflow: hidden;
+      width: 100%;
+      height: 300*@s;
+      background-image: url(../assets/img/topbackground.png);
+      background-size: 100% 100%;
+      .profilePicture{
+        width: 140*@s;
+        height: 140*@s;
+        margin: 68*@s 0*@s 0*@s 22*@s;
+        border-radius: 50%;
+      }
+      .minM{
+        color: #FFFFFF;
+        font-size: 24*@s;
+        font-family:"PingFang-SC-Regular";
+      }
+      .vipId{
+        position: absolute;
+        top: 102*@s;
+        left:200*@s
+      }
+      .vipName{
+        position: absolute;
+        top: 150*@s;
+        left: 200*@s
+      }
+    }
+    .b-top{
+      position: relative;
+      width: 100%;
+      height: 95*@s;
+      margin: 40*@s 0*@s 0*@s 60*@s;
+      .top-tubiao{
+        margin-top: -30*@s;
+        width: 54*@s;
+        height: 54*@s;
+      }
+      .top-tubiaowz{
+        color: #000000;
+        font-size: 24*@s;
+        font-family:"PingFang-SC-Medium";
+      }
+      // .left{
+      //   position: absolute;
+      //   top: 80*@s;
+      //   left: 15*@s;
+      // }
+      .center{
+        position: absolute;
+        top: 45*@s;
+        left: 100*@s;
+      }
+      .right{
+        position: absolute;
+        top:45*@s;
+        right: 205*@s;
+      }
+     }
+  }
+  .home-bottom{
+    background-color: #FFFFFF;
+    width: 100%;
+    position: absolute;
+    top: 450*@s;
+    bottom: 30*@s;
+    left: 0*@s;
+    .tubiaodiv{
+      margin-top: 60*@s;
+      position: relative;
+      overflow: hidden;
+      float: left;
+      width: 24.3%;
+      height: 0;
+      padding-bottom: 20%;
+      .home-bottom-imgdiv{
+         position: absolute;
+         top: 0;
+         left: 0;
+         right: 0;
+         bottom: .44*@s;
+         box-sizing: border-box;
+         padding: .1*@s;
+         .home-bottom-img{
+            display: block;
+            margin: 0 auto;
+            width: 34%;
+         }
+
+      }
+      .home-bottom-desc{
+           font-size:28*@s;
+           position: absolute;
+           left:0;
+           right: 0;
+           bottom:40*@s;
+           line-height: 0*@s;
+           text-align: center;
+           color:#000000;
+         }
+    }
+
+    }
+     .home-logout{
+       overflow: hidden;
+        margin-top: 10*@s;
+        position:fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+    }
+
+}
+::-webkit-scrollbar {/*隐藏滚轮*/
+    display: none;
+
+}
+
+.fade-enter-active{
+
+  transition: opacity 20s;
+}
+.fade-enter {
+  opacity: 0;
+}
+
+}
+
+</style>
