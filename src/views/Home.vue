@@ -109,7 +109,7 @@ export default {
                 { imgSrc: promIcon, title: '授权码', to: { name: 'sendProm' }, show: this.isInArray([1], this.member.aType) },
                 { imgSrc: rechargeMoney, title: '充值', to: { name: 'recharge' }, show: this.isInArray([1], this.member.roleType) },
                 { imgSrc: setting, title: '设置', to: { name: 'setting' }, show: this.isInArray([1, 2, 3, 4,5], this.member.aType) },
-                { imgSrc: orderManage, title: '订单管理', to: { name: 'orderManage' }, show: this.isInArray([1], this.member.aType) }
+                { imgSrc: orderManage, title: '订单管理', to: { name: 'orderManage' }, show: this.isInArray([1, 99], this.member.aType) }
             ]
         },
         fileMsgListCom() {
@@ -130,6 +130,8 @@ export default {
                 text = '联合运营商' // '商户'
             } else if (type === 5) {
                 text = '商家' // '商户'
+            } else if (type === 99) {
+                text = '供应商' // '商户'
             }
             return text
         }
