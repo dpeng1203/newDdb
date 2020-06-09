@@ -104,7 +104,7 @@ export default {
                 { imgSrc: stats, title: '申领设备', to: { name: 'buy' }, show: this.isInArray([1, 2, 3, 4,5], this.member.aType) },
                 { imgSrc: shop, title: '报表查询', to: { name: 'statsAgent' }, show: this.isInArray([1, 2, 3, 4,5], this.member.aType) },
                 { imgSrc: order, title: '订单查询', to: { name: 'orderQuery' }, show: this.isInArray([1, 2, 3, 4,5], this.member.aType) },
-                { imgSrc: macPriceIcon, title: '设备价格', to: { name: 'devicePrice' }, show: this.isInArray([5], this.member.aType) },
+                { imgSrc: macPriceIcon, title: '设备价格', to: { name: 'devicePrice' }, show: this.isInArray([4,5], this.member.aType) },
                 { imgSrc: agentUpIcon, title: '升级运营', to: { name: 'agentUp' }, show: this.isInArray([5], this.member.aType) },
                 { imgSrc: promIcon, title: '授权码', to: { name: 'sendProm' }, show: this.isInArray([1], this.member.aType) },
                 { imgSrc: rechargeMoney, title: '充值', to: { name: 'recharge' }, show: this.isInArray([1], this.member.roleType) },
@@ -113,9 +113,9 @@ export default {
             ]
         },
         fileMsgListCom() {
-          return this.menuList.filter(item => {
-            return item.show;
-          });
+            return this.menuList.filter(item => {
+                return item.show;
+            });
         },
         role () {
             let type = this.member.aType
@@ -155,11 +155,11 @@ export default {
         },
         //授权
         accredit() {
-          let url = window.location.href.split('#')[0]
-          fetchPost('/zqxry/agentAuthorization', {url}).then(res => {
-            console.log(res)
-              window.location.href = res
-          })
+            let url = window.location.href.split('#')[0]
+            fetchPost('/zqxry/agentAuthorization', {url}).then(res => {
+                console.log(res)
+                window.location.href = res
+            })
         },
     },
     // beforeRouteEnter (to, from, next) {
@@ -218,19 +218,19 @@ export default {
     //     })
     // },
     mounted() {
-      let url = window.location.href.split('#')[0]
+        let url = window.location.href.split('#')[0]
         let code
         if(url.indexOf('code') > -1) {
-          let search = url.split('?')[1]
-          let keyVal = search.split('#')[0]
-          let arr = keyVal.split('&')
-          arr.forEach(ele => {
-            if(ele.indexOf('code') > -1) {
-              code = ele.split('=')[1]
-            }
-          })
+            let search = url.split('?')[1]
+            let keyVal = search.split('#')[0]
+            let arr = keyVal.split('&')
+            arr.forEach(ele => {
+                if(ele.indexOf('code') > -1) {
+                    code = ele.split('=')[1]
+                }
+            })
         }else{
-          this.accredit()
+            this.accredit()
         }
         let params = {
             opType: 201,
@@ -249,7 +249,7 @@ export default {
                 Dialog.alert({
                     message: err.msg
                 }).then(() => {
-                  this.$router.push({ name: 'login' })
+                    this.$router.push({ name: 'login' })
                     // next({ name: 'login' })
                 })
             } else {
